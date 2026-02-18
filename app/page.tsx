@@ -33,14 +33,12 @@ export default function Home() {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [paymentModal, setPaymentModal] = useState<{open: boolean, amount: number}>({ open: false, amount: 0 });
+  const [paymentModal, setPaymentModal] = useState<{open: boolean, amount: number | string}>({ open: false, amount: 0 });
 
-  // LIVE SCHALTER (true = Stream sichtbar, false = Offline-Cover)
   const [isLive, setIsLive] = useState(false); 
 
   useEffect(() => { setMounted(true); }, []);
 
-  // HALL OF FAME DATEN
   const donators = [
     { name: "Sabine Buhre", min: "20", insta: "-", date: "18.02.2026" }
   ];
@@ -65,6 +63,9 @@ export default function Home() {
         }
         .star-line { position: absolute; height: 1.5px; background: linear-gradient(90deg, transparent, white); animation: shooting-star 14s linear infinite; pointer-events: none; }
         input[type='range'] { accent-color: #3b82f6; cursor: pointer; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.5); border-radius: 10px; }
       `}</style>
 
       {/* BACKGROUND */}
@@ -77,76 +78,47 @@ export default function Home() {
         </div>
       </div>
 
-      {/* AUFBAU-INFO BANNER */}
+      {/* BANNER */}
       <div className="relative z-[40] w-full max-w-2xl mt-4 mb-4 bg-blue-600/20 border border-blue-500/40 backdrop-blur-md p-3 rounded-2xl flex items-center justify-center gap-3">
         <span className="flex h-2 w-2 relative">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
         </span>
-        <p className="text-[11px] md:text-xs font-bold uppercase tracking-widest text-blue-200 text-center">
-          Seite im Aufbau – Sleepstreams bald verfügbar!
-        </p>
+        <p className="text-[11px] md:text-xs font-bold uppercase tracking-widest text-blue-200">Seite im Aufbau – Sleepstreams bald verfügbar!</p>
       </div>
 
-      {/* DESKTOP SPENDEN-SEKTION (Nur XL Bildschirme) */}
-      <div className="absolute left-10 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-20 w-64 hidden xl:flex">
-        <div className="mb-2 text-center">
+      {/* DESKTOP SUPPORT (LINKSBÜNDIG) */}
+      <div className="absolute left-10 top-[60%] -translate-y-1/2 flex flex-col gap-4 z-20 w-64 hidden xl:flex text-white">
+        <div className="mb-2 text-left">
           <p className="text-blue-400 text-[12px] font-bold uppercase tracking-[0.2em]">Support</p>
-          <h3 className="text-2xl font-black italic uppercase">SCHENKE <span className="text-blue-500">LEBENSZEIT</span></h3>
+          <h3 className="text-2xl font-black italic uppercase leading-tight">SCHENKE <br/><span className="text-blue-500">LEBENSZEIT</span></h3>
         </div>
-        <button onClick={() => setPaymentModal({open: true, amount: 5})} className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-5 rounded-xl font-black text-lg shadow-lg uppercase transition-all hover:scale-105 active:scale-95 text-center">5 Min. schenken<br/><span className="text-xs opacity-60">5,00 €</span></button>
+        <button onClick={() => setPaymentModal({open: true, amount: 5})} className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-5 rounded-xl font-black text-lg shadow-lg uppercase transition-all hover:scale-105 active:scale-95 text-center">5 Min.<br/><span className="text-xs opacity-60">5,00 €</span></button>
         <div className="grid grid-cols-3 gap-2">
           {[10, 20, 50].map((v) => (
-            <button key={v} onClick={() => setPaymentModal({open: true, amount: v})} className="bg-white/5 border border-white/10 py-4 rounded-lg font-black hover:bg-white/10 transition-all text-white">{v}€</button>
+            <button key={v} onClick={() => setPaymentModal({open: true, amount: v})} className="bg-white/5 border border-white/10 py-4 rounded-lg font-black hover:bg-white/10 transition-all">{v}€</button>
           ))}
         </div>
-        <input id="customMin" type="number" placeholder="Minuten" className="bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-sm outline-none focus:border-blue-500 text-white" />
-        <button onClick={() => { const i = document.getElementById('customMin') as HTMLInputElement; setPaymentModal({open: true, amount: Number(i.value)}); }} className="bg-indigo-600/60 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-white/10 text-white font-black">Bestätigen</button>
+        <input id="customMinDesk" type="number" placeholder="Minuten" className="bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-sm outline-none focus:border-blue-500 text-white" />
+        <button onClick={() => { const i = document.getElementById('customMinDesk') as HTMLInputElement; setPaymentModal({open: true, amount: Number(i.value)}); }} className="bg-indigo-600/60 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-white/10 font-black">Bestätigen</button>
       </div>
 
-      {/* HAUPT-CONTENT */}
+      {/* CONTENT */}
       <div className="relative z-10 w-full max-w-3xl flex flex-col items-center text-center">
         <header className="mt-6 mb-8">
           <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase italic text-white">SCHLAFSTREIK</h1>
           <p className="text-blue-300 italic tracking-[0.3em] text-sm md:text-base">Träumend gegen das System.</p>
         </header>
 
-        {/* MOBILE SPENDEN (Sichtbar auf Handys/Tablets) */}
-        <div className="flex flex-col gap-3 w-full max-w-sm mb-10 xl:hidden z-20 px-4">
-            <div className="text-center mb-1">
-                <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">Support</p>
-                <h3 className="text-xl font-black italic uppercase">SCHENKE <span className="text-blue-500">LEBENSZEIT</span></h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-                {[5, 10, 20, 50].map((v) => (
-                    <button key={v} onClick={() => setPaymentModal({open: true, amount: v})} className="bg-blue-600/20 border border-blue-500/40 p-4 rounded-2xl font-black text-sm uppercase shadow-lg active:scale-95 transition-all">
-                        {v}€ <br/><span className="text-[9px] opacity-70 font-normal">{v} Min.</span>
-                    </button>
-                ))}
-            </div>
-            <button onClick={() => setPaymentModal({open: true, amount: 0})} className="bg-white/5 border border-white/10 p-3 rounded-xl font-black text-[10px] uppercase opacity-60 tracking-widest">Anderer Betrag</button>
-        </div>
-
-        {/* LIVE STREAM BEREICH */}
         <div className="w-full aspect-video bg-black/60 border border-white/10 rounded-[2rem] shadow-2xl flex items-center justify-center relative mb-8 overflow-hidden">
           {!isLive && (
-            <div className="absolute inset-0 z-20 bg-[#00040a] flex flex-col items-center justify-center p-6">
+            <div className="absolute inset-0 z-20 bg-[#00040a] flex flex-col items-center justify-center p-6 text-center">
               <div className="w-32 h-32 mb-4 opacity-10 bg-blue-500 rounded-full blur-3xl absolute"></div>
-              <h3 className="text-xl font-black uppercase italic text-white/40 tracking-widest relative">Signal Offline</h3>
-              <p className="text-[10px] text-blue-400/40 uppercase font-bold mt-2 tracking-[0.3em] relative">Nächster Streik in Kürze</p>
+              <h3 className="text-xl font-black uppercase italic text-white/40 tracking-widest">Signal Offline</h3>
+              <p className="text-[10px] text-blue-400/40 uppercase font-bold mt-2 tracking-[0.3em]">Nächster Streik in Kürze</p>
             </div>
           )}
-          {isLive && (
-            <div className="absolute top-6 left-6 flex items-center gap-2 z-30">
-              <span className="w-2.5 h-2.5 bg-red-600 rounded-full animate-pulse"></span>
-              <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Live Signal</span>
-            </div>
-          )}
-          <iframe 
-            className={`w-full h-full transition-opacity duration-1000 ${isLive ? 'opacity-100' : 'opacity-0'}`}
-            src="https://www.youtube.com/embed/live_stream?channel=UCqLmnT6O4yKVw1utCQJk1Pw&autoplay=1&mute=1" 
-            title="Schlafstreik Live Stream" frameBorder="0" allowFullScreen>
-          </iframe>
+          <iframe className={`w-full h-full transition-opacity duration-1000 ${isLive ? 'opacity-100' : 'opacity-0'}`} src="https://www.youtube.com/embed/live_stream?channel=UCqLmnT6O4yKVw1utCQJk1Pw&autoplay=1&mute=1" title="Schlafstreik Live Stream" frameBorder="0" allowFullScreen></iframe>
         </div>
 
         {/* PLAYER */}
@@ -156,7 +128,7 @@ export default function Home() {
               <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Official Soundtrack</span>
               <h2 className="text-xl font-bold italic uppercase text-white">Schlafstreik <span className="text-xs font-normal opacity-40 ml-2">by Marcel</span></h2>
             </div>
-            <button onClick={toggleAudio} className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center shadow-lg active:scale-95 transition-all">
+            <button onClick={toggleAudio} className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center shadow-lg active:scale-95 transition-all text-white">
               {isPlaying ? (<div className="flex gap-1.5"><div className="w-1.5 h-5 bg-white"></div><div className="w-1.5 h-5 bg-white"></div></div>) : (<div className="ml-1 w-0 h-0 border-t-[10px] border-t-transparent border-l-[16px] border-l-white border-b-[10px] border-b-transparent"></div>)}
             </button>
           </div>
@@ -167,11 +139,29 @@ export default function Home() {
           </div>
         </div>
 
+        {/* MOBILE SPENDEN */}
+        <div className="flex flex-col gap-3 w-full max-w-sm mb-12 xl:hidden z-20 px-4">
+            <div className="text-center mb-1">
+                <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">Support</p>
+                <h3 className="text-xl font-black italic uppercase">SCHENKE <span className="text-blue-500">LEBENSZEIT</span></h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-white">
+                {[5, 10, 20, 50].map((v) => (
+                    <button key={v} onClick={() => setPaymentModal({open: true, amount: v})} className="bg-blue-600/20 border border-blue-500/40 p-5 rounded-2xl font-black uppercase shadow-lg active:scale-95 transition-all">
+                        <span className="text-2xl">{v}€</span> <br/>
+                        <span className="text-sm opacity-80 font-bold tracking-tighter">{v} Min.</span>
+                    </button>
+                ))}
+            </div>
+            <button onClick={() => setPaymentModal({open: true, amount: ""})} className="bg-white text-black border border-white p-4 rounded-xl font-black text-[14px] uppercase tracking-widest mt-2 active:bg-blue-500 transition-all">
+               Anderer Betrag
+            </button>
+        </div>
+
         <button onClick={() => setShowHallOfFame(true)} className="px-12 py-4 bg-white text-black font-black uppercase italic tracking-[0.2em] rounded-full transition-all hover:scale-110 hover:shadow-[0_0_30px_white] active:scale-95 mb-10">Die Hall of Fame</button>
       </div>
 
-      {/* FOOTER */}
-      <footer className="mt-10 flex flex-col items-center gap-4 pb-10 relative z-10 w-full text-white">
+      <footer className="mt-10 flex flex-col items-center gap-4 pb-10 relative z-10 w-full text-center">
         <p className="text-white/30 text-[9px] tracking-[0.3em] uppercase">Marcel 15.02.2026</p>
         <div className="flex gap-6">
           <button onClick={() => setShowImpressum(true)} className="text-[10px] text-white/30 hover:text-white transition-colors uppercase tracking-widest font-bold">Impressum</button>
@@ -182,73 +172,52 @@ export default function Home() {
       {/* MODAL: PAYMENT */}
       {paymentModal.open && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center backdrop-blur-xl bg-black/90 p-4">
-          <div className="bg-[#0f172a] border border-blue-500/30 w-full max-w-md rounded-[40px] p-8 md:p-10 text-center relative">
+          <div className="bg-[#0f172a] border border-blue-500/30 w-full max-w-md rounded-[40px] p-8 md:p-10 text-center relative text-white">
             <button onClick={() => setPaymentModal({open: false, amount: 0})} className="absolute top-6 right-8 text-white/20 hover:text-white text-2xl">✕</button>
-            <div className="text-5xl font-black mb-6 italic text-white">{paymentModal.amount},00 €</div>
-            <div className="mb-8 p-6 bg-blue-600/10 rounded-2xl border border-blue-500/30 text-left">
-                <p className="text-[10px] font-black uppercase text-blue-400 tracking-widest mb-3">Wichtig für die Hall of Fame:</p>
-                <p className="text-[14px] text-white leading-relaxed font-bold">
-                  Nutze bitte <span className="text-blue-400">NACH</span> der Zahlung den <span className="underline italic">Chat-Button unten rechts</span>!
-                </p>
-                <p className="text-[12px] text-white/60 mt-2 italic">Schick mir dort deinen Namen und/oder deinen Instagram-Namen wenn du in der Hall of Fame verewigt werden möchtest.</p>
+            <div className="mb-6">
+                {paymentModal.amount === "" || typeof paymentModal.amount === 'string' ? (
+                    <div className="flex flex-col items-center">
+                        <p className="text-blue-400 text-[10px] font-black uppercase mb-2">Betrag eingeben</p>
+                        <div className="flex items-center gap-2">
+                             <input autoFocus type="number" placeholder="0" className="bg-transparent border-b-2 border-blue-500 text-5xl font-black w-32 text-center outline-none text-white" onChange={(e) => setPaymentModal({...paymentModal, amount: e.target.value})} />
+                             <span className="text-4xl font-black">€</span>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-5xl font-black italic text-white">{paymentModal.amount},00 €</div>
+                )}
             </div>
             <div className="flex flex-col gap-4">
-              <button onClick={() => window.open(`https://www.paypal.com/paypalme/marcelsmoney/${paymentModal.amount}EUR`, '_blank')} className="w-full bg-[#0070ba] py-5 rounded-2xl font-black text-xl text-white">PayPal</button>
+              <button onClick={() => { const val = paymentModal.amount || 0; window.open(`https://www.paypal.com/paypalme/marcelsmoney/${val}EUR`, '_blank'); }} className="w-full bg-[#0070ba] py-5 rounded-2xl font-black text-xl text-white">PayPal</button>
               <button onClick={() => window.open("https://buy.stripe.com/00w8wP3Rx5CGfyA22caAw00", '_blank')} className="w-full bg-white/10 border border-white/10 py-5 rounded-2xl text-[10px] font-black tracking-widest text-white uppercase">Stripe / Karte</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* CHAT BUTTON */}
-      <div className="fixed bottom-6 right-6 z-[150]">
-        <div className="relative">
-          <span className="absolute inset-0 rounded-full bg-blue-500 animate-ping opacity-20"></span>
-          <button onClick={() => setShowChatInfo(true)} className="relative w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(37,99,235,0.6)] border border-blue-400/50 active:scale-95 transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
-            <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-[#00040a]"></span>
-          </button>
-        </div>
-      </div>
-
-      {/* MODAL: CHAT INFO */}
-      {showChatInfo && (
-        <div className="fixed inset-0 z-[400] flex items-center justify-center backdrop-blur-md bg-black/90 p-4">
-          <div className="bg-[#0f172a] border border-white/10 w-full max-w-sm rounded-[2rem] p-8 text-center text-white">
-            <h2 className="text-xl font-black italic uppercase mb-4">Let's Talk</h2>
-            <p className="text-sm text-white/60 mb-8 leading-relaxed">Hier kannst du mir deinen Namen & Insta für die Hall of Fame schicken:</p>
-            <div className="flex flex-col gap-4">
-              <button onClick={() => window.open('https://instagram.com/_marcelslifestyle_', '_blank')} className="py-4 bg-white/5 rounded-xl border border-white/10 font-bold hover:bg-white/10 transition-all">Instagram DM</button>
-              <button onClick={() => window.open('mailto:marcel.lueck@outlook.com')} className="py-4 bg-white/5 rounded-xl border border-white/10 font-bold hover:bg-white/10 transition-all">E-Mail schreiben</button>
-            </div>
-            <button onClick={() => setShowChatInfo(false)} className="mt-8 text-[10px] text-white/20 uppercase font-black">Schließen</button>
-          </div>
-        </div>
-      )}
-
       {/* MODAL: HALL OF FAME */}
       {showHallOfFame && (
-        <div className="fixed inset-0 z-[500] flex items-center justify-center backdrop-blur-md bg-black/80 p-4">
-          <div className="bg-[#0f172a] border-2 border-white/20 w-full max-w-2xl rounded-[2.5rem] p-6 md:p-10 relative">
-            <button onClick={() => setShowHallOfFame(false)} className="absolute top-6 right-8 text-white/40 text-2xl">✕</button>
-            <h2 className="text-2xl md:text-3xl font-black uppercase mb-8 italic text-white text-white">Hall of <span className="text-blue-500">Fame</span></h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left min-w-[400px]">
+        <div className="fixed inset-0 z-[500] flex items-center justify-center backdrop-blur-md bg-black/80 p-4 text-white">
+          <div className="bg-[#0f172a] border-2 border-white/20 w-full max-w-2xl rounded-[2.5rem] p-5 md:p-10 relative">
+            <button onClick={() => setShowHallOfFame(false)} className="absolute top-4 right-6 text-white/40 text-2xl z-50">✕</button>
+            <h2 className="text-2xl md:text-3xl font-black uppercase mb-8 italic">Hall of <span className="text-blue-500">Fame</span></h2>
+            <div className="overflow-x-auto pb-4 custom-scrollbar">
+              <table className="w-full text-left min-w-[480px]">
                 <thead>
-                  <tr className="text-blue-400 text-[10px] uppercase font-black border-b border-white/10">
-                    <th className="pb-4">Rebell</th>
-                    <th className="pb-4">Support</th>
-                    <th className="pb-4">Instagram</th>
+                  <tr className="text-blue-400 text-[10px] md:text-xs uppercase font-black border-b border-white/10">
+                    <th className="pb-4 pr-4">Rebell</th>
+                    <th className="pb-4 pr-4">Support</th>
+                    <th className="pb-4 pr-4">Instagram</th>
                     <th className="pb-4 text-right">Datum</th>
                   </tr>
                 </thead>
-                <tbody className="text-white">
+                <tbody>
                   {donators.map((d, i) => (
-                    <tr key={i} className="border-b border-white/5">
-                      <td className="py-4 font-bold">{d.name}</td>
-                      <td className="py-4 font-black text-blue-300">{d.min} MIN</td>
-                      <td className="py-4 text-xs opacity-60">{d.insta}</td>
-                      <td className="py-4 text-[10px] opacity-40 text-right">{d.date}</td>
+                    <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td className="py-4 font-bold text-sm md:text-base pr-4">{d.name}</td>
+                      <td className="py-4 font-black text-blue-300 text-sm md:text-base pr-4">{d.min} MIN</td>
+                      <td className="py-4 text-xs opacity-90 pr-4">{d.insta}</td>
+                      <td className="py-4 text-[10px] opacity-40 text-right whitespace-nowrap">{d.date}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -258,35 +227,72 @@ export default function Home() {
         </div>
       )}
 
-      {/* IMPRESSUM & DATENSCHUTZ */}
+      {/* CHAT MODAL */}
+      <div className="fixed bottom-6 right-6 z-[150]">
+        <button onClick={() => setShowChatInfo(true)} className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+        </button>
+      </div>
+
+      {showChatInfo && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center backdrop-blur-md bg-black/90 p-4">
+          <div className="bg-[#0f172a] border border-white/10 w-full max-w-sm rounded-[2rem] p-8 text-center text-white">
+            <h2 className="text-xl font-black italic uppercase mb-4">Let's Talk</h2>
+            <div className="flex flex-col gap-4">
+              <button onClick={() => window.open('https://instagram.com/_marcelslifestyle_', '_blank')} className="py-4 bg-white/5 rounded-xl border border-white/10 font-bold text-white">Instagram DM</button>
+              <button onClick={() => window.open('mailto:marcel.lueck@outlook.com')} className="py-4 bg-white/5 rounded-xl border border-white/10 font-bold text-white">E-Mail schreiben</button>
+            </div>
+            <button onClick={() => setShowChatInfo(false)} className="mt-8 text-[10px] text-white/20 uppercase font-black">Schließen</button>
+          </div>
+        </div>
+      )}
+
+      {/* IMPRESSUM */}
       {showImpressum && (
         <div className="fixed inset-0 z-[600] flex items-center justify-center backdrop-blur-md bg-black/95 p-4 text-white">
           <div className="bg-[#0f172a] border border-white/10 w-full max-w-lg rounded-3xl p-10 relative">
             <button onClick={() => setShowImpressum(false)} className="absolute top-6 right-8 text-white/40 text-2xl">✕</button>
             <h2 className="text-2xl font-black uppercase mb-6 italic border-b border-white/5 pb-4">Impressum</h2>
-            <div className="space-y-4 text-sm font-mono">
-              <div><p className="text-blue-400 text-[10px] font-black uppercase">Betreiber</p><p className="font-bold text-white">Marcel Lück</p><p>Möckernstraße 80, 28201 Bremen</p></div>
-              <div><p className="text-blue-400 text-[10px] font-black uppercase">Kontakt</p><p className="text-white">marcel.lueck@outlook.com</p></div>
+            <div className="space-y-4 text-sm font-mono text-white">
+              <div><p className="text-blue-400 text-[10px] font-black uppercase">Betreiber</p><p className="font-bold">Marcel Lück</p><p>Möckernstraße 80, 28201 Bremen</p></div>
+              <div><p className="text-blue-400 text-[10px] font-black uppercase">Kontakt</p><p>marcel.lueck@outlook.com</p></div>
             </div>
           </div>
         </div>
       )}
 
+      {/* VOLLSTÄNDIGER DATENSCHUTZ */}
       {showDatenschutz && (
         <div className="fixed inset-0 z-[600] flex items-center justify-center backdrop-blur-md bg-black/95 p-4 text-white">
-          <div className="bg-[#0f172a] border border-white/10 w-full max-w-xl rounded-3xl p-10 relative max-h-[80vh] overflow-y-auto">
+          <div className="bg-[#0f172a] border border-white/10 w-full max-w-xl rounded-3xl p-10 relative max-h-[85vh] overflow-y-auto custom-scrollbar">
             <button onClick={() => setShowDatenschutz(false)} className="absolute top-6 right-8 text-white/40 text-2xl">✕</button>
             <h2 className="text-2xl font-black uppercase mb-6 italic border-b border-white/5 pb-4">Datenschutz</h2>
-            <div className="space-y-4 text-[12px] text-white/70 leading-relaxed font-sans">
-              <p className="font-bold text-white">1. Datenverarbeitung</p>
-              <p>Betrieb durch Vercel Inc. Erhebung von Server-Log-Dateien.</p>
-              <p className="font-bold text-white">2. Spenden</p>
-              <p>Abwicklung über PayPal/Stripe.</p>
+            <div className="space-y-6 text-[12px] text-white/80 leading-relaxed font-sans pr-2">
+              <section>
+                <h3 className="text-blue-400 font-black uppercase mb-2">1. Allgemeine Informationen</h3>
+                <p>Der Schutz deiner Daten hat höchste Priorität. Diese Erklärung gibt dir einen Überblick, was mit deinen personenbezogenen Daten passiert, wenn du diese Website besuchst.</p>
+              </section>
+              <section>
+                <h3 className="text-blue-400 font-black uppercase mb-2">2. Cookies & Speicherung</h3>
+                <p><strong>Wir verwenden keine Cookies.</strong> Auf unseren eigenen Servern werden keine personenbezogenen Daten von Besuchern dauerhaft gespeichert, außer den technisch notwendigen Protokollen des Hosters.</p>
+              </section>
+              <section>
+                <h3 className="text-blue-400 font-black uppercase mb-2">3. Hosting & Datenübertragung</h3>
+                <p>Unsere Website wird bei Vercel Inc. gehostet. Beim Aufruf der Seite werden automatisch Server-Log-Dateien (IP-Adresse, Browser, Zeitstempel) erfasst, die für den sicheren Betrieb notwendig sind.</p>
+              </section>
+              <section>
+                <h3 className="text-blue-400 font-black uppercase mb-2">4. Drittanbieter-Einbindungen</h3>
+                <p><strong>YouTube:</strong> Wir binden Videos über YouTube ein. Dabei werden Daten an Google-Server übertragen (auch in die USA), sobald der Stream geladen wird.</p>
+                <p><strong>Zahlungsdienste (PayPal & Stripe):</strong> Wenn du Support leistest, werden deine Zahlungsdaten direkt an PayPal oder Stripe übermittelt. Wir speichern keine Kreditkartendaten oder Passwörter auf unseren Servern.</p>
+              </section>
+              <section>
+                <h3 className="text-blue-400 font-black uppercase mb-2">5. Deine Rechte</h3>
+                <p>Du hast jederzeit das Recht auf unentgeltliche Auskunft über Herkunft, Empfänger und Zweck deiner gespeicherten Daten sowie ein Recht auf Berichtigung oder Löschung dieser Daten. Kontaktiere uns dazu bitte per E-Mail.</p>
+              </section>
             </div>
           </div>
         </div>
       )}
-
     </main>
   );
 }
