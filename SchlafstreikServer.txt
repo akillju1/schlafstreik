@@ -19,7 +19,6 @@ const StarField = React.memo(() => {
       ))}
     </div>
   );
-
 });
 StarField.displayName = "StarField";
 
@@ -34,32 +33,22 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [paymentModal, setPaymentModal] = useState<{open: boolean, amount: number | string}>({ open: false, amount: 0 });
+  
+  const [isLive, setIsLive] = useState(false); 
+  const [volume, setVolume] = useState(0.8); 
 
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-
-  const [paymentModal, setPaymentModal] = useState<{ open: boolean, amount: number | string }>({ open: false, amount: 0 });
-  const [selectedMilestone, setSelectedMilestone] = useState<number | null>(null);
-  const [isLive, setIsLive] = useState(false);
-  const [volume, setVolume] = useState(0.8);
-
-  const currentTotal = 20;
+  const currentTotal = 20; 
   const goalTotal = 1000000;
-  // Hilfsfunktion für die optische Streckung (Wurzel-Skalierung)
-  const getVisualPos = (val: number | string) => {
-    const amount = typeof val === 'string' ? parseFloat(val.replace(/\./g, '')) : val;
-    if (isNaN(amount) || amount <= 0) return 0;
-    // Math.sqrt sorgt dafür, dass kleine Beträge am Anfang mehr Platz bekommen
-    return (Math.sqrt(amount) / Math.sqrt(goalTotal)) * 100;
-  };
+  const progressPercent = (currentTotal / goalTotal) * 100;
 
   const milestones = [
-    { amount: 5000, title: "Equipment Upgrade", icon: "🎙️", desc: "Falls gewünscht ein professionelles Mikro für den Stream." },
-    { amount: 15000, title: "Mission Thailand", icon: "✈️", desc: "Ich packe meine Koffer und fliege nach Thailand." },
-    { amount: 50000, title: "Home Base", icon: "🏠", desc: "Nie wieder Miete. Ich kaufe mir meine eigene Wohnung und sichere mir meine Basis." },
-    { amount: 100000, title: "Full-Time Rebel", icon: "🔥", desc: "Geld gut angelegt in Aktien und ETF." },
-    { amount: 200000, title: "Gründung Hilfsorganisation", icon: "🤝", desc: "Zeit, etwas zurückzugeben. Ich gründe eine eigene Organisation, um anderen zu helfen." },
-    { amount: 1000000, title: "The Million Mark", icon: "💎", desc: "Das Ziel ist erreicht. 10% (100.000€) werden umgehend gespendet." },
-    { amount: "1.000.000+", title: "Beyond Freedom", icon: "👑", desc: "Alles über der Million wird zu 50% gespendet. Geld wird gut angelegt und von erzielten Renditen wird regelmäßig was gespendet. Wir verändern die Welt im Schlaf." },
+    { amount: 5000, title: "Equipment Upgrade", icon: "🎙️" },
+    { amount: 15000, title: "Mission Thailand", icon: "✈️" },
+    { amount: 50000, title: "Home Base", icon: "🏠" },
+    { amount: 100000, title: "Full-Time Rebel", icon: "🔥" },
+    { amount: 200000, title: "Charity Foundation", icon: "🤝" },
+    { amount: 1000000, title: "The Million Mark", icon: "💎" },
   ];
 
   useEffect(() => { setMounted(true); }, []);
@@ -70,33 +59,14 @@ export default function Home() {
     }
   }, [volume]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    const slider = scrollRef.current;
-    if (!slider) return;
-    const startX = e.pageX - slider.offsetLeft;
-    const scrollLeft = slider.scrollLeft;
-    const onMouseMove = (e: MouseEvent) => {
-      e.preventDefault();
-      const x = e.pageX - slider.offsetLeft;
-      const walk = (x - startX) * 2;
-      slider.scrollLeft = scrollLeft - walk;
-    };
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  };
-
   const donators = [{ name: "Sabine Buhre", min: "20", insta: "-", date: "18.02.2026" }];
 
   const partners = [
-    {
-      name: "Dein Unternehmen",
-      logo: "/partner-placeholder.png",
-      amount: "2324",
-      desc: "Beispiellogo - Sichere dir diesen Platz als Hauptpartner."
+    { 
+      name: "Dein Unternehmen", 
+      logo: "/partner-placeholder.png", // Datei muss im Ordner 'public' liegen
+      amount: "2324", 
+      desc: "Beispiellogo - Sichere dir diesen Platz als Hauptpartner." 
     },
     ...Array(9).fill(null).map((_, i) => ({
       name: "Deine Brand hier?",
@@ -108,7 +78,7 @@ export default function Home() {
 
   const toggleAudio = () => {
     if (audioRef.current) {
-      isPlaying ? audioRef.current.pause() : audioRef.current.play().catch(() => { });
+      isPlaying ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
       setIsPlaying(!isPlaying);
     }
   };
@@ -138,8 +108,6 @@ export default function Home() {
         input[type='range'] { accent-color: #3b82f6; cursor: pointer; }
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.5); border-radius: 10px; }
-        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
 
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -150,12 +118,13 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Desktop Support Sidebar */}
       <div className="absolute left-10 top-[60%] -translate-y-1/2 flex flex-col gap-4 z-20 w-64 hidden xl:flex text-left">
         <div>
           <p className="text-blue-400 text-[12px] font-bold uppercase tracking-[0.2em]">Support</p>
-          <h3 className="text-2xl font-black italic uppercase leading-tight text-white">SCHENKE <br /><span className="text-blue-500">LEBENSZEIT</span></h3>
+          <h3 className="text-2xl font-black italic uppercase leading-tight text-white">SCHENKE <br/><span className="text-blue-500">LEBENSZEIT</span></h3>
         </div>
-        <button onClick={() => openPayment(5)} className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-5 rounded-xl font-black text-lg shadow-lg uppercase transition-all hover:scale-105 active:scale-95 text-center">5 Min.<br /><span className="text-xs opacity-60">5,00 €</span></button>
+        <button onClick={() => openPayment(5)} className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-5 rounded-xl font-black text-lg shadow-lg uppercase transition-all hover:scale-105 active:scale-95 text-center">5 Min.<br/><span className="text-xs opacity-60">5,00 €</span></button>
         <div className="grid grid-cols-3 gap-2">
           {[10, 20, 50].map((v) => (
             <button key={v} onClick={() => openPayment(v)} className="bg-white/5 border border-white/10 text-white py-4 rounded-lg font-black hover:bg-white/10 transition-all">{v}€</button>
@@ -179,91 +148,38 @@ export default function Home() {
               <p className="text-white/40 text-[10px] uppercase font-bold mt-2">Der Stream startet in Kürze</p>
             </div>
           )}
-          <iframe
-            className={`w-full h-full transition-opacity duration-1000 ${isLive ? 'opacity-100' : 'opacity-0'}`}
-            src="https://www.youtube.com/embed/live_stream?channel=UCqLmnT6O4yKVw1utCQJk1Pw&autoplay=1&mute=1"
-            frameBorder="0"
+          <iframe 
+            className={`w-full h-full transition-opacity duration-1000 ${isLive ? 'opacity-100' : 'opacity-0'}`} 
+            src="https://www.youtube.com/embed/live_stream?channel=UCqLmnT6O4yKVw1utCQJk1Pw&autoplay=1&mute=1" 
+            frameBorder="0" 
             allowFullScreen>
           </iframe>
         </div>
 
-        {/* Milestone Cards Horizontal Scroll */}
         <div className="w-full mb-4 text-left">
-          <h3 className="text-blue-400 text-[12px] font-black uppercase tracking-[0.3em] mb-4">The Road to Freedom</h3>
-          <div
-            ref={scrollRef}
-            onMouseDown={handleMouseDown}
-            className="flex gap-4 overflow-x-auto pb-6 custom-scrollbar snap-x cursor-grab active:cursor-grabbing select-none"
-          >
-            {milestones.map((m, i) => {
-              const isSelected = selectedMilestone === i;
-              return (
-                <div
-                  key={i}
-                  onClick={() => setSelectedMilestone(isSelected ? null : i)}
-                  className={`min-w-[200px] snap-center cursor-pointer transition-all duration-300 border rounded-2xl p-4 backdrop-blur-md 
-                    ${isSelected ? 'bg-blue-600/30 border-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.2)]' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
-                >
-                  <div className="flex justify-between items-start">
-                    <span className="text-4xl">{m.icon}</span>
-                    <div className={`text-blue-400 transition-transform ${isSelected ? 'rotate-180' : ''}`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                  <p className="text-blue-500 font-black text-xl mt-4">
-                    {typeof m.amount === 'number' ? m.amount.toLocaleString() : m.amount} € </p>
-                  <h4 className="font-black uppercase italic text-[14px] leading-tight text-white mb-2">{m.title}</h4>
-                  {isSelected && (
-                    <div className="mt-3 pt-3 border-t border-white/10 animate-fadeIn">
-                      <p className="text-[14px] text-white/70 leading-relaxed italic">{m.desc}</p>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <h3 className="text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4">The Road to Freedom</h3>
+          <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
+            {milestones.map((m, i) => (
+              <div key={i} className="min-w-[160px] snap-center bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-md">
+                <span className="text-2xl">{m.icon}</span>
+                <p className="text-blue-500 font-black text-sm mt-2">{m.amount.toLocaleString()} €</p>
+                <h4 className="font-black uppercase italic text-[10px] leading-tight text-white">{m.title}</h4>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* --- DYNAMISCHER FORTSCHRITTSBALKEN (LOGARITHMISCH GESTRECKT) --- */}
         <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 mb-10 backdrop-blur-md">
-          <div className="flex justify-between items-end mb-2 text-white">
-            <div className="flex flex-col items-start">
-              <span className="text-[12px] font-black text-blue-400 uppercase tracking-widest">Fortschritt</span>
-              <span className="text-xl font-black italic">{currentTotal.toLocaleString()} €</span>
+            <div className="flex justify-between items-end mb-2 text-white">
+                <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Fortschritt: {currentTotal}€</span>
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Ziel: 1.000.000€</span>
             </div>
-            <div className="flex flex-col items-end">
-              <span className="text-[12px] font-black text-white/40 uppercase tracking-widest">Ziel</span>
-              <span className="text-xl font-black italic text-white/60">{goalTotal.toLocaleString()} €</span>
+            <div className="w-full h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                <div className="h-full bg-blue-600 shadow-[0_0_15px_#2563eb]" style={{ width: `${Math.max(progressPercent, 0.2)}%` }} />
             </div>
-          </div>
-
-          <div className="w-full h-6 bg-black/60 rounded-full border border-white/10 relative overflow-hidden">
-            {/* Blauer Fortschrittsbalken */}
-            <div
-              className="h-full bg-blue-600 shadow-[0_0_20px_#2563eb] transition-all duration-1000 ease-out"
-              style={{ width: `${Math.max(getVisualPos(currentTotal), 0.8)}%` }}
-            />
-
-            {/* Gelbe Milestone-Markierungen */}
-            {milestones.map((m, idx) => {
-              const position = getVisualPos(m.amount);
-              // Nur anzeigen, wenn innerhalb der Leiste
-              if (position >= 100 || position <= 0) return null;
-
-              return (
-                <div
-                  key={idx}
-                  className="absolute top-0 w-[2px] h-full bg-yellow-400 shadow-[0_0_8px_#facc15] z-30"
-                  style={{ left: `${position}%` }}
-                />
-              );
-            })}
-          </div>
         </div>
-        {/* --- BALKEN BLOCK ENDE --- */}
 
+        {/* --- AUDIO PLAYER SECTION --- */}
         <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl mb-12 text-left">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -293,20 +209,20 @@ export default function Home() {
 
       {/* Payment Modal */}
       {paymentModal.open && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center backdrop-blur-xl bg-black/90 p-4 cursor-pointer" onClick={() => setPaymentModal({ open: false, amount: 0 })}>
+        <div className="fixed inset-0 z-[300] flex items-center justify-center backdrop-blur-xl bg-black/90 p-4 cursor-pointer" onClick={() => setPaymentModal({open: false, amount: 0})}>
           <div className="bg-[#0f172a] border border-blue-500/30 w-full max-w-md rounded-[40px] p-8 md:p-10 text-center relative cursor-default" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setPaymentModal({ open: false, amount: 0 })} className="absolute top-6 right-8 text-white/20 hover:text-white text-2xl">✕</button>
+            <button onClick={() => setPaymentModal({open: false, amount: 0})} className="absolute top-6 right-8 text-white/20 hover:text-white text-2xl">✕</button>
             <h3 className="text-sm font-black uppercase tracking-[0.2em] text-blue-400 mb-6">Support bestätigen</h3>
             <div className="mb-10 flex flex-col items-center">
-              <div className="flex items-center gap-2">
-                {paymentModal.amount === "" ? (
-                  <input autoFocus type="number" placeholder="0" className="bg-transparent border-b-2 border-blue-500 text-6xl font-black w-32 text-center outline-none text-white" onChange={(e) => setPaymentModal({ ...paymentModal, amount: e.target.value })} />
-                ) : (
-                  <span className="text-6xl font-black italic text-white">{paymentModal.amount}</span>
-                )}
-                <span className="text-4xl font-black text-blue-500">€</span>
-              </div>
-              <p className="text-[10px] text-white/40 uppercase mt-2 font-bold tracking-widest text-white">Wähle deine Zahlungsmethode</p>
+                <div className="flex items-center gap-2">
+                  {paymentModal.amount === "" ? (
+                      <input autoFocus type="number" placeholder="0" className="bg-transparent border-b-2 border-blue-500 text-6xl font-black w-32 text-center outline-none text-white" onChange={(e) => setPaymentModal({...paymentModal, amount: e.target.value})} />
+                  ) : (
+                      <span className="text-6xl font-black italic text-white">{paymentModal.amount}</span>
+                  )}
+                  <span className="text-4xl font-black text-blue-500">€</span>
+                </div>
+                <p className="text-[10px] text-white/40 uppercase mt-2 font-bold tracking-widest text-white">Wähle deine Zahlungsmethode</p>
             </div>
             <div className="grid grid-cols-1 gap-4 mb-8">
               <button onClick={() => { const val = paymentModal.amount || 0; window.open(`https://www.paypal.com/paypalme/marcelsmoney/${val}EUR`, '_blank'); }} className="w-full bg-[#0070ba] text-white py-5 rounded-2xl font-black text-xl uppercase tracking-widest hover:scale-[1.02] transition-transform flex items-center justify-center gap-3">PayPal</button>
@@ -360,48 +276,10 @@ export default function Home() {
                   </div>
                 </div>
               ) : (
-                <div>
-                  <div className="bg-blue-600/10 border border-blue-500/30 rounded-2xl p-6 mb-8 text-center">
-                    <p className="text-blue-400 font-black uppercase tracking-widest text-[13px] italic">Werde Teil der Bewegung</p>
-                    <p className="text-white/60 text-[10px] uppercase font-bold tracking-widest mt-1">Die Rangliste wird nach Spendenhöhe sortiert.</p>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                      <thead>
-                        <tr className="text-blue-400 text-[10px] uppercase font-black border-b border-white/10 text-white">
-                          <th className="pb-4 w-12 text-center">Rang</th>
-                          <th className="pb-4">Name</th>
-                          <th className="pb-4">Zeit</th>
-                          <th className="pb-4">Instagram</th>
-                          <th className="pb-4 text-right">Datum</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {donators.map((d, i) => {
-                          const rank = i + 1;
-                          let trophy = null;
-                          if (rank === 1) trophy = "🏆";
-                          else if (rank === 2) trophy = "🥈";
-                          else if (rank === 3) trophy = "🥉";
-
-                          return (
-                            <tr key={i} className="border-b border-white/5 text-white hover:bg-white/5 transition-colors">
-                              <td className="py-4 font-black text-center text-lg">
-                                {trophy ? trophy : <span className="text-sm opacity-30">{rank}</span>}
-                              </td>
-                              <td className={`py-4 font-bold ${rank <= 3 ? 'text-blue-100' : 'text-white'}`}>
-                                {d.name}
-                              </td>
-                              <td className="py-4 font-black text-blue-400">{d.min} MIN</td>
-                              <td className="py-4 text-xs font-mono opacity-60">{d.insta}</td>
-                              <td className="py-4 text-[10px] opacity-40 text-right">{d.date}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                <table className="w-full text-left">
+                  <thead><tr className="text-blue-400 text-[10px] uppercase font-black border-b border-white/10 text-white"><th className="pb-4">Name</th><th className="pb-4">Zeit</th><th className="pb-4">Instagram</th><th className="pb-4 text-right">Datum</th></tr></thead>
+                  <tbody>{donators.map((d, i) => (<tr key={i} className="border-b border-white/5 text-white"><td className="py-4 font-bold">{d.name}</td><td className="py-4 font-black text-blue-300">{d.min} MIN</td><td className="py-4 text-xs font-mono opacity-60">{d.insta}</td><td className="py-4 text-[10px] opacity-40 text-right">{d.date}</td></tr>))}</tbody>
+                </table>
               )}
             </div>
           </div>
@@ -453,13 +331,15 @@ export default function Home() {
         </div>
       )}
 
+      {/* Footer */}
       <footer className="mt-10 flex flex-col items-center gap-4 pb-10 relative z-10 w-full text-center">
         <div className="flex gap-6">
           <button onClick={() => setShowImpressum(true)} className="text-[10px] text-white/30 hover:text-white transition-colors uppercase font-bold">Impressum</button>
           <button onClick={() => setShowDatenschutz(true)} className="text-[10px] text-white/30 hover:text-white transition-colors uppercase font-bold">Datenschutz</button>
         </div>
       </footer>
-
+      
+      {/* Floating Chat Button */}
       <div className="fixed bottom-6 right-6 z-[150]">
         <button onClick={() => setShowChatInfo(true)} className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all text-white">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
