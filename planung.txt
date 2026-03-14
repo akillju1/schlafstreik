@@ -1,0 +1,9 @@
+Die "Halb-Automatische" Lösung (Für Fortgeschrittene)
+Wenn du bei deinen eigenen Links (PayPal/Stripe) bleiben willst, kannst du Zapier oder Make.com nutzen.
+
+Workflow: 1.  PayPal schickt eine Bestätigungs-E-Mail bei Zahlungseingang.
+2.  Zapier erkennt die Mail, liest den Betrag aus.
+3.  Zapier schreibt diesen Betrag in eine Google Tabelle oder eine Datenbank (Supabase/Firebase).
+4.  Dein Code auf der Website liest diese Datenbank aus und aktualisiert den Balken in Echtzeit.
+
+Vorteil: Du behältst die volle Kontrolle über deine Links.
